@@ -1,9 +1,9 @@
 import SwiftUI
 import SwiftData
 
-struct AdminView: View {
+struct PlanEditorView: View {
     var body: some View {
-        Text("Admin View Placeholder")
+        Text("Plan Editor View Placeholder")
             .padding()
     }
 }
@@ -15,7 +15,7 @@ struct AdminView: View {
             configurations: ModelConfiguration(isStoredInMemoryOnly: true)
         )
         SeedData.ensureSeed(container: container)
-        return AdminView()
+        return PlanEditorView()
             .modelContainer(container)
     } catch {
         return Text("Preview error: \(error.localizedDescription)")

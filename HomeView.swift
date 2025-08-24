@@ -110,5 +110,15 @@ struct HomeView: View {
 }
 
 #Preview {
-    HomeView()
+    do {
+        let container = try ModelContainer(
+            for: [LunchPlan.self, PrepStep.self],
+            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+        )
+        SeedData.ensureSeed(container: container)
+        return HomeView()
+            .modelContainer(container)
+    } catch {
+        return Text("Preview error: \(error.localizedDescription)")
+    }
 }
