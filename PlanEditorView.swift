@@ -47,7 +47,15 @@ struct PlanEditorView: View {
 }
 
 #Preview {
-    NavigationStack {
-        PlanEditorView(plan: nil)
+    let container = try! ModelContainer(
+        for: [LunchPlan.self, PrepStep.self],
+        configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+    )
+    SeedData.ensureSeed(container: container)
+    let context = ModelContext(container)
+    let plan = try? context.fetch(FetchDescriptor<LunchPlan>()).first
+    return NavigationStack {
+        PlanEditorView(plan: plan)
     }
+    .modelContainer(container)
 }

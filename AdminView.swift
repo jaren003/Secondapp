@@ -49,5 +49,11 @@ struct AdminView: View {
 }
 
 #Preview {
-    AdminView()
+    let container = try! ModelContainer(
+        for: [LunchPlan.self, PrepStep.self],
+        configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+    )
+    SeedData.ensureSeed(container: container)
+    return AdminView()
+        .modelContainer(container)
 }
