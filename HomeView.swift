@@ -76,8 +76,13 @@ struct HomeView: View {
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
+            #if os(iOS)
             RoundedRectangle(cornerRadius: 16)
-                .fill(Color(uiColor: .systemBackground))
+                .fill(Color(.systemBackground))
+            #elseif os(macOS)
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color(nsColor: .windowBackgroundColor))
+            #endif
         )
         .shadow(radius: 1)
     }
@@ -112,8 +117,13 @@ struct HomeView: View {
             .padding()
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(
+                #if os(iOS)
                 RoundedRectangle(cornerRadius: 16)
-                    .fill(Color(uiColor: .systemBackground))
+                    .fill(Color(.systemBackground))
+                #elseif os(macOS)
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(Color(nsColor: .windowBackgroundColor))
+                #endif
             )
             .shadow(radius: 1)
         }
