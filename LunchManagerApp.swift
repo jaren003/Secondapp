@@ -3,6 +3,20 @@ import SwiftData
 
 @main
 struct LunchManagerApp: App {
+    @AppStorage("hasSeeded") private var hasSeeded = false
+
+    var sharedModelContainer: ModelContainer = {
+        let container = try! ModelContainer(for: [LunchPlan.self, PrepStep.self])
+        return container
+    }()
+
+    init() {
+        if !hasSeeded {
+            SeedData.ensureSeed(container: sharedModelContainer)
+            hasSeeded = true
+        }
+    }
+
     var body: some Scene {
         WindowGroup {
             TabView {
@@ -21,8 +35,8 @@ struct LunchManagerApp: App {
                         Label("Settings", systemImage: "gearshape")
                     }
             }
-            .modelContainer(for: [])
         }
+        .modelContainer(sharedModelContainer)
     }
 }
 
