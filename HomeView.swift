@@ -23,13 +23,13 @@ struct HomeView: View {
                         let nightSteps = plan.steps.filter { $0.timing == .nightBefore }
                         let morningSteps = plan.steps.filter { $0.timing == .morningOf }
 
-                        prepSection(title: "Prep Tonight", systemImage: "moon.stars", steps: nightSteps, done: $tonightCompleted)
-                        prepSection(title: "Prep Morning", systemImage: "sun.max", steps: morningSteps, done: $morningCompleted)
+                        prepSection(timing: .nightBefore, title: "Prep Tonight", systemImage: "moon.stars", steps: nightSteps, done: $tonightCompleted)
+                        prepSection(timing: .morningOf, title: "Prep Morning", systemImage: "sun.max", steps: morningSteps, done: $morningCompleted)
                     }
                     .padding()
                 } else {
                     VStack(spacing: 16) {
-                        Text("No plan for \(tomorrow, style: .date) yet.")
+                        Text("No plan for \(tomorrow.weekdayMonthDay()) yet.")
                             .multilineTextAlignment(.center)
                         Button("Create Plan for Tomorrow") {
                             // Placeholder action
@@ -39,36 +39,38 @@ struct HomeView: View {
                     .padding()
                 }
             }
-            .navigationTitle("Tomorrow")
+            .navigationTitle(tomorrow.weekdayMonthDay())
         }
     }
 
     @ViewBuilder
     private func summaryCard(for plan: LunchPlan) -> some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(plan.date, style: .date)
+            Text(plan.date.weekdayMonthDay())
                 .font(.title2.bold())
 
             Label(plan.main, systemImage: "fork.knife")
                 .font(.headline)
+                .accessibilityLabel("Main: \(plan.main)")
 
             if !plan.sides.isEmpty {
                 HStack {
                     ForEach(plan.sides, id: \.self) { side in
-                        Text(side)
-                            .padding(8)
-                            .background(Capsule().fill(Color.accentColor.opacity(0.2)))
+                        Pill(text: side)
                     }
                 }
+                .accessibilityLabel("Sides: \(plan.sides.joined(separator: ", "))")
             }
 
             if let drink = plan.drink, !drink.isEmpty {
                 Text("Drink: \(drink)")
+                    .accessibilityLabel("Drink: \(drink)")
             }
 
             if let notes = plan.notes, !notes.isEmpty {
                 Text(notes)
                     .italic()
+                    .accessibilityLabel("Notes: \(notes)")
             }
         }
         .padding()
@@ -76,16 +78,17 @@ struct HomeView: View {
         .background(
             RoundedRectangle(cornerRadius: 16)
                 .fill(Color(uiColor: .systemBackground))
-                .shadow(radius: 1)
         )
+        .shadow(radius: 1)
     }
 
     @ViewBuilder
-    private func prepSection(title: String, systemImage: String, steps: [PrepStep], done: Binding<Set<UUID>>) -> some View {
+    private func prepSection(timing: PrepTiming, title: String, systemImage: String, steps: [PrepStep], done: Binding<Set<UUID>>) -> some View {
         if !steps.isEmpty {
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 12) {
                 Label(title, systemImage: systemImage)
                     .font(.headline)
+                    .foregroundStyle(sectionHeaderColor(for: timing))
                 ForEach(steps) { step in
                     Button {
                         if done.wrappedValue.contains(step.id) {
@@ -103,8 +106,16 @@ struct HomeView: View {
                         }
                         .padding(.vertical, 4)
                     }
+                    .accessibilityLabel(done.wrappedValue.contains(step.id) ? "Mark \(step.text) incomplete" : "Mark \(step.text) complete")
                 }
             }
+            .padding()
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(Color(uiColor: .systemBackground))
+            )
+            .shadow(radius: 1)
         }
     }
 }
