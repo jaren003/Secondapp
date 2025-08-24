@@ -34,7 +34,7 @@ struct AdminView: View {
                 }
             }
             .navigationDestination(isPresented: $isAdding) {
-                PlanEditorView(plan: nil)
+                PlanEditorView()
             }
         }
     }

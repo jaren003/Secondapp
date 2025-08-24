@@ -5,7 +5,7 @@ import SwiftData
 struct LunchManagerApp: App {
     @AppStorage("hasSeeded") private var hasSeeded = false
 
-    var sharedModelContainer: ModelContainer = {
+    private var sharedModelContainer: ModelContainer = {
         let container = try! ModelContainer(for: [LunchPlan.self, PrepStep.self])
         return container
     }()

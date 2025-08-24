@@ -43,5 +43,11 @@ struct SettingsView: View {
 }
 
 #Preview {
-    SettingsView()
+    let container = try! ModelContainer(
+        for: [LunchPlan.self, PrepStep.self],
+        configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+    )
+    SeedData.ensureSeed(container: container)
+    return SettingsView()
+        .modelContainer(container)
 }
