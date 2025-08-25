@@ -88,24 +88,33 @@ enum SeedData {
         let context = ModelContext(container)
 
         let fetch = FetchDescriptor<LunchPlan>()
-        if (try? context.fetch(fetch))?.isEmpty == true {
-            let tomorrow = Date().tomorrow()
-            let plan = LunchPlan(
-                date: tomorrow,
-                main: "Sandwich",
-                sides: ["Chips", "Fruit"],
-                drink: "Water",
-                notes: "Pack utensils"
-            )
+        do {
+            let plans = try context.fetch(fetch)
+            if plans.isEmpty {
+                let tomorrow = Date().tomorrow()
+                let plan = LunchPlan(
+                    date: tomorrow,
+                    main: "Sandwich",
+                    sides: ["Chips", "Fruit"],
+                    drink: "Water",
+                    notes: "Pack utensils"
+                )
 
-            let step1 = PrepStep(text: "Prepare ingredients", timing: .nightBefore, plan: plan)
-            let step2 = PrepStep(text: "Assemble sandwich", timing: .morningOf, plan: plan)
-            let step3 = PrepStep(text: "Pack lunch bag", timing: .morningOf, plan: plan)
+                let step1 = PrepStep(text: "Prepare ingredients", timing: .nightBefore, plan: plan)
+                let step2 = PrepStep(text: "Assemble sandwich", timing: .morningOf, plan: plan)
+                let step3 = PrepStep(text: "Pack lunch bag", timing: .morningOf, plan: plan)
 
-            plan.steps = [step1, step2, step3]
+                plan.steps = [step1, step2, step3]
 
-            context.insert(plan)
-            try? context.save()
+                context.insert(plan)
+                do {
+                    try context.save()
+                } catch {
+                    print("Failed to seed data: \(error.localizedDescription)")
+                }
+            }
+        } catch {
+            print("Failed to fetch lunch plans for seeding: \(error.localizedDescription)")
         }
     }
 }
