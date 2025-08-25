@@ -7,6 +7,8 @@ struct PlanEditorView: View {
 
     @Bindable var plan: LunchPlan
     @State private var sidesText: String
+    @State private var saveErrorMessage = ""
+    @State private var isSaveErrorPresented = false
 
     init(plan: LunchPlan) {
         self._plan = Bindable(wrappedValue: plan)
@@ -107,6 +109,11 @@ struct PlanEditorView: View {
                     .disabled(plan.main.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             }
         }
+        .alert("Failed to Save", isPresented: $isSaveErrorPresented, actions: {
+            Button("OK", role: .cancel) {}
+        }, message: {
+            Text(saveErrorMessage)
+        })
     }
 
     private func addStep(timing: PrepTiming) {
@@ -131,8 +138,13 @@ struct PlanEditorView: View {
         if plan.modelContext == nil {
             context.insert(plan)
         }
-        try? context.save()
-        dismiss()
+        do {
+            try context.save()
+            dismiss()
+        } catch {
+            saveErrorMessage = error.localizedDescription
+            isSaveErrorPresented = true
+        }
     }
 }
 
